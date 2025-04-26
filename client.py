@@ -1,6 +1,5 @@
 import xmlrpc.client
 
-
 server = xmlrpc.client.ServerProxy("http://localhost:3000/")
 
 def main():
