@@ -25,7 +25,7 @@ def main():
                 password = input("Enter password: ")
                 response = server.signup(username, password)
                 print(response)
-                continue
+                
             else:
                 print("Invalid option.")
                 continue

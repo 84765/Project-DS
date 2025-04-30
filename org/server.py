@@ -35,7 +35,7 @@ def signup(username, password):
     tree = load_users()
     root = tree.getroot()
     for user in root.findall("user"):
-        if user.get("username"):
+        if user.get("username") == username:
             return "Username already exists"
     hashed = hash_password(password)
     user_element = ET.SubElement(root, "user", username=username, password=hashed)
