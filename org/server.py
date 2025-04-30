@@ -6,10 +6,55 @@ import datetime
 import requests
 import sys
 import time
+import hashlib
+import secrets
 
 RECIPE_FILE = "recipe-book.xml"
 API_KEY = "e37b51667add46c585347e30a76a4768"
-PEERS = set()  
+PEERS = set()
+SESSION = {}
+USER_FILE = "users.xml"
+
+def hash_password(password):
+    return hashlib.md5(password.encode()).hexdigest()
+
+def load_users():
+    try:
+        tree = ET.parse(USER_FILE)
+        return tree
+    except FileNotFoundError:
+        root = ET.Element("users")
+        tree = ET.ElementTree(root)
+        tree.write(USER_FILE)
+        return tree
+
+def save_users(tree):
+    tree.write(USER_FILE)
+
+def signup(username, password):
+    tree = load_users()
+    root = tree.getroot()
+    for user in root.findall("user"):
+        if user.get("username"):
+            return "Username already exists"
+    hashed = hash_password(password)
+    user_element = ET.SubElement(root, "user", username=username, password=hashed)
+    save_users(tree)
+    return "signup successfull"
+
+def login(username, password):
+    tree = load_users()
+    root = tree.getroot()
+    hashed_input = hash_password(password)
+    for user in root.findall("user"):
+        if user.get("username") == username and user.get("password") == hashed_input:
+            token = secrets.token_urlsafe(30)
+            SESSION[token] = username
+            return token
+    return "login failed"
+
+def authenticate_token(token):
+    return token in SESSION
 
 def load():
     try:
@@ -45,7 +90,9 @@ def fetch_recipe(food):
     except Exception as e:
         return f"Unexpected error for {food}: {e}"
 
-def add_recipe(food):
+def add_recipe(token, food):
+    if not authenticate_token(token):
+        return "Authentication failed"
     recipe_links = fetch_recipe(food)
     if isinstance(recipe_links, str):
         return recipe_links
@@ -105,7 +152,10 @@ def add_recipe_remote(food, recipe_link, timestamp):
 
     return f"Recipe '{recipe_link}' synced for '{food}'."
 
-def get_recipes(food):
+def get_recipes(token, food):
+    if not authenticate_token(token):
+        return "Authentication failed"
+
     tree = load()
     root = tree.getroot()
 
@@ -166,6 +216,8 @@ def start_server(port, peers):
     server.register_function(get_recipes, "get_recipes")
     server.register_function(register_peer, "register_peer")
     server.register_function(get_all_data, "get_all_data")
+    server.register_function(signup, "signup")
+    server.register_function(login, "login")
 
     print(f"Server running on port {port}...")
 
