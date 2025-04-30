@@ -12,11 +12,13 @@ import secrets
 RECIPE_FILE = "recipe-book.xml"
 API_KEY = "e37b51667add46c585347e30a76a4768"
 PEERS = set()
-SESSION = {}
 USER_FILE = "users.xml"
+SECRET_CODE ="bE9nNXKIAQcWJqU"
 
 def hash_password(password):
-    return hashlib.md5(password.encode()).hexdigest()
+    salt = "randomsaltvalue5231"
+    hashed_password = hashlib.sha256(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+    return hashed_password
 
 def load_users():
     try:
@@ -45,16 +47,14 @@ def signup(username, password):
 def login(username, password):
     tree = load_users()
     root = tree.getroot()
-    hashed_input = hash_password(password)
+    hash1 = hash_password(password)
     for user in root.findall("user"):
-        if user.get("username") == username and user.get("password") == hashed_input:
-            token = secrets.token_urlsafe(30)
-            SESSION[token] = username
-            return token
+        if user.get("username") == username and user.get("password") == hash1:
+            return SECRET_CODE
     return "Login failed"
 
-def authenticate_token(token):
-    return token in SESSION
+def authenticate_with_secret(secret_code):
+    return secret_code == SECRET_CODE
 
 def load():
     try:
@@ -90,8 +90,8 @@ def fetch_recipe(food):
     except Exception as e:
         return f"Unexpected error for {food}: {e}"
 
-def add_recipe(token, food):
-    if not authenticate_token(token):
+def add_recipe(secret_code, food):
+    if not authenticate_with_secret(secret_code):
         return "Authentication failed"
     recipe_links = fetch_recipe(food)
     if isinstance(recipe_links, str):
@@ -152,8 +152,8 @@ def add_recipe_remote(food, recipe_link, timestamp):
 
     return f"Recipe '{recipe_link}' synced for '{food}'."
 
-def get_recipes(token, food):
-    if not authenticate_token(token):
+def get_recipes(secret_code, food):
+    if not authenticate_with_secret(secret_code):
         return "Authentication failed"
 
     tree = load()

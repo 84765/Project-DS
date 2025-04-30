@@ -1,34 +1,33 @@
 import xmlrpc.client
+SECRET_CODE ="bE9nNXKIAQcWJqU"
 
 def main():
     server_url = input("Enter server : ")
     server = xmlrpc.client.ServerProxy(server_url)
 
-    token = None
-
     while True:
-        if not token:
-            print("1. Login")
-            print("2. Sign up")
-            option = input("Choose an option: ")
-            if option == "1":
-                username = input("Enter username: ")
-                password = input("Enter password: ")
+        print("1. Login")
+        print("2. Sign up")
+        option = input("Choose an option: ")
+        if option == "1":
+            username = input("Enter username: ")
+            password = input("Enter password: ")
 
-                token = server.login(username, password)
-                if ("failed" in token.lower()):
-                    print("Login failed.")
-                    token = None
-                    break
-            elif option == "2":
-                username = input("Enter username: ")
-                password = input("Enter password: ")
-                response = server.signup(username, password)
-                print(response)
-                
+            response = server.login(username, password)
+            if response != SECRET_CODE:
+                print("Login failed, secret is wrong")
+                break
             else:
-                print("Not a valid choice, choose something else")
-                continue
+                print("Login successful")
+        elif option == "2":
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            response = server.signup(username, password)
+            print(response)
+           
+        else:
+            print("Not a valid choice, choose something else")
+            continue
         print("\n1. Search for recipe")
         print("2. Get recipes")
         print("3. Exit")
