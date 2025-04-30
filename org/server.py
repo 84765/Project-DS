@@ -40,7 +40,7 @@ def signup(username, password):
     hashed = hash_password(password)
     user_element = ET.SubElement(root, "user", username=username, password=hashed)
     save_users(tree)
-    return "signup successfull"
+    return "Signup successfull"
 
 def login(username, password):
     tree = load_users()
@@ -51,7 +51,7 @@ def login(username, password):
             token = secrets.token_urlsafe(30)
             SESSION[token] = username
             return token
-    return "login failed"
+    return "Login failed"
 
 def authenticate_token(token):
     return token in SESSION

@@ -27,7 +27,7 @@ def main():
                 print(response)
                 
             else:
-                print("Invalid option.")
+                print("Not a valid choice, choose something else")
                 continue
         print("\n1. Search for recipe")
         print("2. Get recipes")
