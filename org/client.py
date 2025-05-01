@@ -1,5 +1,9 @@
 import xmlrpc.client
-SECRET_CODE ="bE9nNXKIAQcWJqU"
+import os 
+from dotenv import load_dotenv
+load_dotenv()
+
+SECRET_CODE = os.getenv("SECRET_CODE")
 
 def main():
     server_url = input("Enter server : ")
@@ -15,7 +19,7 @@ def main():
 
             response = server.login(username, password)
             if response != SECRET_CODE:
-                print("Login failed, secret is wrong")
+                print("Login failed")
                 break
             else:
                 print("Login successful")

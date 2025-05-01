@@ -7,13 +7,15 @@ import requests
 import sys
 import time
 import hashlib
-import secrets
+import os 
+from dotenv import load_dotenv
+load_dotenv()
 
+SECRET_CODE = os.getenv("SECRET_CODE")
 RECIPE_FILE = "recipe-book.xml"
 API_KEY = "e37b51667add46c585347e30a76a4768"
 PEERS = set()
 USER_FILE = "users.xml"
-SECRET_CODE ="bE9nNXKIAQcWJqU"
 
 def hash_password(password):
     salt = "randomsaltvalue5231"
