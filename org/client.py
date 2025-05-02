@@ -10,19 +10,20 @@ def main():
     server = xmlrpc.client.ServerProxy(server_url)
 
     while True:
-        print("1. Login")
+        print("\n1. Login")
         print("2. Sign up")
         option = input("Choose an option: ")
+
         if option == "1":
             username = input("Enter username: ")
             password = input("Enter password: ")
 
             response = server.login(username, password)
-            if response != SECRET_CODE:
-                print("Login failed")
+            if response == SECRET_CODE:
+                print("Login successful")
                 break
             else:
-                print("Login successful")
+                print("Login failed")
         elif option == "2":
             username = input("Enter username: ")
             password = input("Enter password: ")
@@ -31,7 +32,8 @@ def main():
            
         else:
             print("Not a valid choice, choose something else")
-            continue
+        
+    while True:        
         print("\n1. Search for recipe")
         print("2. Get recipes")
         print("3. Exit")
@@ -39,7 +41,7 @@ def main():
 
         if option == "1":
             food = input("Enter food: ")
-            response = server.add_recipe(token, food)
+            response = server.add_recipe(SECRET_CODE, food)
             if isinstance(response, list):
                 print("\nFetched recipes:")
                 for link in response:
@@ -49,7 +51,7 @@ def main():
 
         elif option == "2":
             food = input("Saved recipes for food: ")
-            response = server.get_recipes(token, food)
+            response = server.get_recipes(SECRET_CODE, food)
             if isinstance(response, list):
                 for r in response:
                     print(r)
